@@ -1,0 +1,43 @@
+name: Build and Release Yiff
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Trigger only on versioned tags
+
+jobs:
+  build-and-release:
+    name: Build and Release Yiff
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20
+
+      # Build the yiff binary
+      - name: Build Yiff Binary
+        run: |
+          mkdir -p build
+          go build -o build/yiff
+
+      # Archive the binary for release
+      - name: Create Release Archive
+        run: |
+          mkdir -p release
+          tar -czvf release/yiff.tar.gz -C build yiff
+
+      # Upload the release asset
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: release/yiff.tar.gz
+          asset_name: yiff.tar.gz
+          asset_content_type: application/gzip
