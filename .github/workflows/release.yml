@@ -21,6 +21,10 @@ jobs:
         with:
           go-version: 1.24
 
+      # Run Makefile to populate ./binaries
+      - name: Run Makefile
+        run: make
+
       # Build the yiff binary
       - name: Build Yiff Binary
         run: |
