@@ -1,0 +1,60 @@
+= **`+yiff+`** -- __YAML diff__
+
+=== Usage
+==== Compare Two Side-by-Side Files
+
+`$  yiff ./tests/values-dev.yaml ./tests/values-prod.yaml`
+++++
+<pre>
+<span style="font-weight:bold;">complexList[1].name</span>: bar → <span style="font-weight:bold;color:olive;">baz</span>
+<span style="font-weight:bold;">complexList[1].value</span>: 2 → <span style="font-weight:bold;color:olive;">3</span>
+<span style="font-weight:bold;">featureFlags.enableBeta</span>: true → <span style="font-weight:bold;color:olive;">false</span>
+<span style="font-weight:bold;">replicaCount</span>: 2 → <span style="font-weight:bold;color:olive;">1</span>
+</pre>
+++++
+
+=== Run as a Service
+
+From the root of the repository:
+
+==== Start the Server
+
+[source,shell]
+----
+$ go run cmd/api/main.go
+2025/07/30 05:25:48 Starting web server on :8080
+----
+
+==== Validate Availability
+
+Again, from the root of the repository:
+
+[source,shell]
+----
+$ curl -sSd @tests/testdata.json http://localhost:8080/diff | jq        
+
+{
+  "variables": [
+    {
+      "name": "key",
+      "default": "value",
+      "value": "newvalue",
+      "status": "changed"
+    }
+  ]
+}
+----
+
+=== Run as a Container
+
+From the root of the repository:
+
+[source,shell]
+----
+$ docker build -t yiff-api .
+----
+
+[source,shell]
+----
+$ docker run --rm -p "8080:8080" yiff-api
+----
