@@ -239,6 +239,17 @@ func formatValuePlain(val interface{}) string {
 	}
 }
 
+func colorize(s, color string) string {
+	return color + s + ColorReset
+}
+
+func formatShellValue(val interface{}) string {
+	if val == nil {
+		return "NaN"
+	}
+	return fmt.Sprintf("%v", val)
+}
+
 // printDiffs outputs diff results in columns, shell, or yaml formats.
 func printDiffs(diffs []differ.VariableDiff, outputFormat string) error {
 	switch outputFormat {
@@ -287,46 +298,28 @@ func printDiffs(diffs []differ.VariableDiff, outputFormat string) error {
 		return nil
 
 	case "shell", "":
-		colored := colorEnabled()
-		maxVarLen := 0
-		maxDefaultLen := 0
 		for _, d := range diffs {
-			varNameFmt := d.Name + ":"
-			if l := visibleLen(varNameFmt); l > maxVarLen {
-				maxVarLen = l
-			}
-			left := formatValue(d.Default)
-			if l := visibleLen(left); l > maxDefaultLen {
-				maxDefaultLen = l
-			}
-		}
-		for _, d := range diffs {
-			varName := d.Name + ":"
-			left := formatValue(d.Default)
-			right := formatValue(d.Value)
-			color := ""
+			left := formatShellValue(d.Default)
+			right := formatShellValue(d.Value)
+			var color string
 			switch d.Status {
-			case "changed":
-				color = ColorYellow
 			case "added":
 				color = ColorGreen
 			case "removed":
 				color = ColorRed
+			case "changed":
+				color = ColorYellow
+			default:
+				color = ""
 			}
-			if colored {
-				fmt.Printf("%s%s%s%s  %s%s%s  →  %s%s%s\n",
-					ColorBold, varName, ColorReset,
-					spaces(maxVarLen-visibleLen(varName)),
-					left, spaces(maxDefaultLen-visibleLen(left)), "",
-					color, right, ColorReset)
-			} else {
-				fmt.Printf("%-*s  %-*s  →  %s\n",
-					maxVarLen, varName,
-					maxDefaultLen, left, right)
-			}
+			// Bold the var name, color only the new value
+			fmt.Printf("%s%s%s: %s → %s%s%s\n",
+				ColorBold, d.Name, ColorReset,
+				left,
+				color, right, ColorReset,
+			)
 		}
 		return nil
-
 	default:
 		return fmt.Errorf("Unknown output format: %s. Supported: 'shell', 'yaml', 'columns'", outputFormat)
 	}
