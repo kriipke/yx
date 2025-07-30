@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/github.com/kriipke/yiff/internal/core"
+	"github.com/kriipke/yiff/internal/core"
 )
 
 func flattenYAML(prefix string, v interface{}, out map[string]interface{}) {
