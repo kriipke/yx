@@ -1,0 +1,49 @@
+= Usage
+
+== Compare Two Side-by-Side Files
+
+`$  yiff ./tests/values-dev.yaml ./tests/values-prod.yaml`
++++
+<body>
+<pre>
+<span style="font-weight:bold;">complexList[1].name</span>: bar → <span style="font-weight:bold;color:olive;">baz</span>
+<span style="font-weight:bold;">complexList[1].value</span>: 2 → <span style="font-weight:bold;color:olive;">3</span>
+<span style="font-weight:bold;">featureFlags.enableBeta</span>: true → <span style="font-weight:bold;color:olive;">false</span>
+<span style="font-weight:bold;">featureFlags.enableCoolFeature</span>: false → <span style="font-weight:bold;color:olive;">true</span>
+<span style="font-weight:bold;">nestedDifference.child.settingA</span>: true → <span style="font-weight:bold;color:olive;">false</span>
+<span style="font-weight:bold;">nestedDifference.child.settingB</span>: dev → <span style="font-weight:bold;color:olive;">prod</span>
+<span style="font-weight:bold;">newInDev</span>: This only exists in dev → <span style="font-weight:bold;color:red;">NaN</span>
+<span style="font-weight:bold;">newInProd</span>: NaN → <span style="font-weight:bold;color:green;">This only exists in prod</span>
+<span style="font-weight:bold;">nginx.enabled</span>: true → <span style="font-weight:bold;color:olive;">false</span>
+<span style="font-weight:bold;">nginx.environment</span>: dev → <span style="font-weight:bold;color:olive;">prod</span>
+<span style="font-weight:bold;">nginx.image.tag</span>: 1.15.2 → <span style="font-weight:bold;color:olive;">1.14.0</span>
+<span style="font-weight:bold;">nginx.ports[1]</span>: 443 → <span style="font-weight:bold;color:red;">NaN</span>
+<span style="font-weight:bold;">nginx.resources.limits.cpu</span>: 500m → <span style="font-weight:bold;color:olive;">1000m</span>
+<span style="font-weight:bold;">nginx.resources.limits.memory</span>: 512Mi → <span style="font-weight:bold;color:olive;">1024Mi</span>
+<span style="font-weight:bold;">nginx.resources.requests.cpu</span>: 200m → <span style="font-weight:bold;color:olive;">500m</span>
+<span style="font-weight:bold;">nginx.resources.requests.memory</span>: 256Mi → <span style="font-weight:bold;color:olive;">512Mi</span>
+<span style="font-weight:bold;">replicaCount</span>: 2 → <span style="font-weight:bold;color:olive;">1</span>
+</pre>
+</body>
++++
+
+== Compare Two Side-by-Side Files
+
+
+`$  yiff tests/values-before.yaml tests/values-after.yaml`
++++
+<body>
+<pre>
+<span style="font-weight:bold;">global.cluster</span>:  → <span style="font-weight:bold;color:olive;">cluster99</span>
+<span style="font-weight:bold;">global.customSecretLicenseKey</span>:  → <span style="font-weight:bold;color:olive;">NEW_RELIC_LICENSE</span>
+<span style="font-weight:bold;">global.customSecretName</span>: supersecret → <span style="font-weight:bold;color:olive;">new-relic-license</span>
+<span style="font-weight:bold;">global.dnsConfig.some</span>: key → <span style="font-weight:bold;color:red;">NaN</span>
+<span style="font-weight:bold;">global.hostNetwork</span>: NaN → <span style="font-weight:bold;color:olive;">10.20.40.0/24</span>
+<span style="font-weight:bold;">k8s-agents-operator.enabled</span>: false → <span style="font-weight:bold;color:olive;">true</span>
+<span style="font-weight:bold;">kube-state-metrics.enabled</span>: false → <span style="font-weight:bold;color:olive;">true</span>
+<span style="font-weight:bold;">newrelic-logging.enabled</span>: false → <span style="font-weight:bold;color:olive;">true</span>
+<span style="font-weight:bold;">newrelic-prometheus-agent.enabled</span>: false → <span style="font-weight:bold;color:olive;">true</span>
+<span style="font-weight:bold;">nri-kube-events.enabled</span>: false → <span style="font-weight:bold;color:olive;">true</span>
+</pre>
+</body>
++++
