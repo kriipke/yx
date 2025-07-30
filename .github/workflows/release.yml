@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: [v*]
+    branches: [main]
 
 jobs:
 
@@ -59,17 +60,6 @@ jobs:
         env:
           OUTPUT: CHANGES.md
           GITHUB_REPO: ${{ github.repository }}
-
-      - name: Upload the binary releases
-        uses: svenstaro/upload-release-action@v2
-        id: artifact-upload-step
-        with:
-          name: yiff-binaries-${{ github.ref }}
-          file: dist/yiff*
-          file_glob: true
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref }}
-          body: ${{ steps.git-cliff.outputs.content }}
 
   release:
 
