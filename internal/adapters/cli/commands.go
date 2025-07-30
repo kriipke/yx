@@ -11,7 +11,6 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/kriipke/yiff/internal/core"
 	"github.com/kriipke/yiff/pkg/differ"
 )
 
