@@ -3,7 +3,7 @@
 === Usage
 ==== Compare Two Side-by-Side Files
 
-`$  yiff ./tests/values-dev.yaml ./tests/values-prod.yaml`
+`$  yx ./tests/values-dev.yaml ./tests/values-prod.yaml`
 ++++
 <pre>
 <span style="font-weight:bold;">complexList[1].name</span>: bar → <span style="font-weight:bold;color:olive;">baz</span>
@@ -51,10 +51,10 @@ From the root of the repository:
 
 [source,shell]
 ----
-$ docker build -t yiff-api .
+$ docker build -t yx-api .
 ----
 
 [source,shell]
 ----
-$ docker run --rm -p "8080:8080" yiff-api
+$ docker run --rm -p "8080:8080" yx-api
 ----
