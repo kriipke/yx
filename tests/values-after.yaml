@@ -1,0 +1,59 @@
+# test
+global:
+  affinity: {}
+  cluster: cluster99
+  containerSecurityContext: {}
+  customAttributes: {}
+  customSecretLicenseKey: NEW_RELIC_LICENSE
+  customSecretName: new-relic-license
+  dnsConfig: {}
+  fargate:
+  fedramp:
+    enabled:
+  hostNetwork:
+  images:
+    pullSecrets: []
+    registry: ""
+  insightsKey: ""
+  labels: {}
+  licenseKey: ""
+  lowDataMode:
+  nodeSelector: {}
+  nrStaging:
+  podLabels: {}
+  podSecurityContext: {}
+  priorityClassName: ""
+  privileged:
+  proxy: ""
+  serviceAccount:
+    annotations: {}
+    create:
+    name:
+  tolerations: []
+  verboseLog:
+k8s-agents-operator:
+  enabled: true
+kube-state-metrics:
+  enabled: true
+newrelic-eapm-agent:
+  enabled: false
+newrelic-infra-operator:
+  enabled: false
+newrelic-infrastructure:
+  enabled: true
+newrelic-k8s-metrics-adapter:
+  enabled: false
+newrelic-logging:
+  enabled: true
+newrelic-pixie:
+  enabled: false
+newrelic-prometheus-agent:
+  enabled: true
+nri-kube-events:
+  enabled: true
+nri-metadata-injection:
+  enabled: true
+nri-prometheus:
+  enabled: false
+pixie-chart:
+  enabled: false
