@@ -10,7 +10,7 @@ global:
   fargate:
   fedramp:
     enabled:
-  hostNetwork:
+  hostNetwork: "10.20.40.0/24"
   images:
     pullSecrets: []
     registry: ""

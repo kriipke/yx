@@ -160,29 +160,29 @@ func runGitRefDirDiff(fromRef, toRef, relPath, outputFormat string) error {
 	}
 
 	// 4. Print summary
-	fmt.Printf("YAML diff summary for %s between %s and %s:\n", relPath, fromRef, toRef)
-	if len(changed) > 0 {
-		fmt.Println("\nChanged files:")
-		for _, c := range changed {
-			fmt.Printf("  %s\n", c.File)
-			printDiffs(c.Diffs, outputFormat)
-		}
-	}
-	if len(added) > 0 {
-		fmt.Println("\nAdded files:")
-		for _, f := range added {
-			fmt.Printf("  %s\n", f)
-		}
-	}
-	if len(removed) > 0 {
-		fmt.Println("\nRemoved files:")
-		for _, f := range removed {
-			fmt.Printf("  %s\n", f)
-		}
-	}
-	if len(changed) == 0 && len(added) == 0 && len(removed) == 0 {
-		fmt.Println("No differences found.")
-	}
+	// fmt.Printf("YAML diff summary for %s between %s and %s:\n", relPath, fromRef, toRef)
+	// if len(changed) > 0 {
+	// 	fmt.Println("\nChanged files:")
+	// 	for _, c := range changed {
+	// 		fmt.Printf("  %s\n", c.File)
+	// 		printDiffs(c.Diffs, outputFormat)
+	// 	}
+	// }
+	// if len(added) > 0 {
+	// 	fmt.Println("\nAdded files:")
+	// 	for _, f := range added {
+	// 		fmt.Printf("  %s\n", f)
+	// 	}
+	// }
+	// if len(removed) > 0 {
+	// 	fmt.Println("\nRemoved files:")
+	// 	for _, f := range removed {
+	// 		fmt.Printf("  %s\n", f)
+	// 	}
+	// }
+	// if len(changed) == 0 && len(added) == 0 && len(removed) == 0 {
+	// 	fmt.Println("No differences found.")
+	// }
 	return nil
 }
 
