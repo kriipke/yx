@@ -1,3 +1,3 @@
-module github.com/kriipke/kaml
+module github.com/kriipke/yiff
 
-go 1.24
+go 1.21
