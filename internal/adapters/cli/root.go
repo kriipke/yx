@@ -1,19 +1,59 @@
 package cli
 
 import (
-	"errors"
-	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 	"github.com/kriipke/yiff/pkg/differ"
+
+	"github.com/spf13/cobra"
 )
+
+var (
+	fromRef      string
+	toRef        string
+	diffPath     string
+	outputFormat string
+)
+
+var rootCmd = &cobra.Command{
+	Use:   "yiff [fileA.yaml] [fileB.yaml]",
+	Short: "YAML diff tool for Helm values and GitOps",
+	Long:  "Diff Helm values YAML files or directories between files or git refs. Supports per-variable, per-file, and per-directory comparisons.",
+	Args:  cobra.MaximumNArgs(2),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		// Directory diff mode (git)
+		if fromRef != "" && toRef != "" && diffPath != "" {
+			return runGitRefDirDiff(fromRef, toRef, diffPath, outputFormat)
+		}
+
+		// Single file diff mode
+		if len(args) == 2 {
+			return runFileDiff(args[0], args[1], outputFormat)
+		}
+
+		// Print usage if not enough arguments
+		cmd.Usage()
+		return fmt.Errorf("invalid arguments")
+	},
+}
+
+func init() {
+	rootCmd.Flags().StringVar(&fromRef, "from", "", "Git ref/tag/commit for the base comparison (used with --to and --path)")
+	rootCmd.Flags().StringVar(&toRef, "to", "", "Git ref/tag/commit for the target comparison (used with --from and --path)")
+	rootCmd.Flags().StringVar(&diffPath, "path", "", "Compare all yaml files under this path between --from and --to refs")
+	rootCmd.Flags().StringVarP(&outputFormat, "output", "o", "shell", "Output format: 'shell' (default) or 'yaml'")
+}
+
+
+// Entrypoint for Cobra
+func Execute() error {
+	return rootCmd.Execute()
+}
 
 const (
 	ColorReset  = "\x1b[0m"
@@ -48,48 +88,14 @@ func colorEnabled() bool {
 	return (fi.Mode() & os.ModeCharDevice) != 0
 }
 
-func formatValue(val interface{}) string {
-	switch v := val.(type) {
-	case string:
-		return fmt.Sprintf("“%s”", v)
-	case nil:
-		return "null"
-	default:
-		return fmt.Sprintf("%v", v)
-	}
-}
 
-// Entrypoint for CLI
-func Run(args []string) error {
-	fs := flag.NewFlagSet("yiff", flag.ContinueOnError)
-	outputFormat := fs.String("o", "shell", "Output format: 'shell' (default) or 'yaml'")
-	fromRef := fs.String("from", "", "Git ref/tag/commit for the base comparison (used with --to and --path)")
-	toRef := fs.String("to", "", "Git ref/tag/commit for the target comparison (used with --from and --path)")
-	diffPath := fs.String("path", "", "Compare all yaml files under this path between --from and --to refs")
-	if err := fs.Parse(args); err != nil {
-		return err
-	}
-
-	// --- New gitops diff mode ---
-	if *fromRef != "" && *toRef != "" && *diffPath != "" {
-		return runGitRefDirDiff(*fromRef, *toRef, *diffPath, *outputFormat)
-	}
-
-	// --- Default: file-vs-file diff ---
-	return runFileDiff(fs, outputFormat)
-}
-
-// File-vs-file mode (unchanged)
-func runFileDiff(fs *flag.FlagSet, outputFormat *string) error {
-	if fs.NArg() < 2 {
-		return errors.New(fmt.Sprintf("Usage: %s [flags] <file1.yaml> <file2.yaml>", filepath.Base(os.Args[0])))
-	}
-	fileA, fileB := fs.Arg(0), fs.Arg(1)
-	dataA, err := ioutil.ReadFile(fileA)
+// Update runFileDiff signature!
+func runFileDiff(fileA, fileB, outputFormat string) error {
+	dataA, err := os.ReadFile(fileA)
 	if err != nil {
 		return fmt.Errorf("Failed to load %s: %w", fileA, err)
 	}
-	dataB, err := ioutil.ReadFile(fileB)
+	dataB, err := os.ReadFile(fileB)
 	if err != nil {
 		return fmt.Errorf("Failed to load %s: %w", fileB, err)
 	}
@@ -102,7 +108,7 @@ func runFileDiff(fs *flag.FlagSet, outputFormat *string) error {
 		return fmt.Errorf("Failed to parse %s: %w", fileB, err)
 	}
 	diffs := differ.Diff(yamlA, yamlB)
-	return printDiffs(diffs, *outputFormat)
+	return printDiffs(diffs, outputFormat)
 }
 
 // --- Directory diff between git refs ---
@@ -209,8 +215,66 @@ func gitShowFile(ref, file string) ([]byte, error) {
 	return cmd.Output()
 }
 
+
+func formatValue(val interface{}) string {
+	switch v := val.(type) {
+	case string:
+		return fmt.Sprintf("“%s”", v)
+	case nil:
+		return "null"
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
+// formatValuePlain returns string values as-is (no quotes).
+func formatValuePlain(val interface{}) string {
+	switch v := val.(type) {
+	case string:
+		return v
+	case nil:
+		return ""
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
+// printDiffs outputs diff results in columns, shell, or yaml formats.
 func printDiffs(diffs []differ.VariableDiff, outputFormat string) error {
 	switch outputFormat {
+	case "columns":
+		type row struct {
+			Key   string
+			Old   string
+			Arrow string
+			New   string
+		}
+		rows := make([]row, 0, len(diffs))
+		for _, d := range diffs {
+			rows = append(rows, row{
+				Key:   d.Name + ":",
+				Old:   formatValuePlain(d.Default),
+				Arrow: "->",
+				New:   formatValuePlain(d.Value),
+			})
+		}
+		// Find max width for each column
+		maxKey, maxOld, maxArrow := 0, 0, 2
+		for _, r := range rows {
+			if l := len(r.Key); l > maxKey {
+				maxKey = l
+			}
+			if l := len(r.Old); l > maxOld {
+				maxOld = l
+			}
+		}
+		// Print aligned
+		for _, r := range rows {
+			fmt.Printf("%-*s  %-*s  %-*s  %s\n",
+				maxKey, r.Key, maxOld, r.Old, maxArrow, r.Arrow, r.New)
+		}
+		return nil
+
 	case "yaml":
 		out := map[string]interface{}{
 			"variables": diffs,
@@ -220,7 +284,9 @@ func printDiffs(diffs []differ.VariableDiff, outputFormat string) error {
 			return fmt.Errorf("Error marshaling YAML: %w", err)
 		}
 		fmt.Print(string(yamlBytes))
-	case "shell":
+		return nil
+
+	case "shell", "":
 		colored := colorEnabled()
 		maxVarLen := 0
 		maxDefaultLen := 0
@@ -259,8 +325,9 @@ func printDiffs(diffs []differ.VariableDiff, outputFormat string) error {
 					maxDefaultLen, left, right)
 			}
 		}
+		return nil
+
 	default:
-		return fmt.Errorf("Unknown output format: %s. Supported: 'shell', 'yaml'", outputFormat)
+		return fmt.Errorf("Unknown output format: %s. Supported: 'shell', 'yaml', 'columns'", outputFormat)
 	}
-	return nil
 }
