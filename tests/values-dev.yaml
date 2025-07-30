@@ -1,0 +1,32 @@
+nginx:
+  image:
+    tag: "1.15.2"
+    repository: "nginxinc/nginx-unprivileged"
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+    requests:
+      cpu: "200m"
+      memory: "256Mi"
+  ports:
+    - 80
+    - 443
+  enabled: true
+  environment: dev
+replicaCount: 2
+featureFlags:
+  enableBeta: true
+  enableCoolFeature: false
+emptyString: ""
+nullValue: null
+newInDev: "This only exists in dev"
+complexList:
+  - name: foo
+    value: 1
+  - name: bar
+    value: 2
+nestedDifference:
+  child:
+    settingA: true
+    settingB: "dev"

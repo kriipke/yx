@@ -1,0 +1,31 @@
+nginx:
+  image:
+    tag: "1.14.0"
+    repository: "nginxinc/nginx-unprivileged"
+  resources:
+    limits:
+      cpu: "1000m"
+      memory: "1024Mi"
+    requests:
+      cpu: "500m"
+      memory: "512Mi"
+  ports:
+    - 80
+  enabled: false
+  environment: prod
+replicaCount: 1
+featureFlags:
+  enableBeta: false
+  enableCoolFeature: true
+emptyString: ""
+nullValue: null
+newInProd: "This only exists in prod"
+complexList:
+  - name: foo
+    value: 1
+  - name: baz
+    value: 3
+nestedDifference:
+  child:
+    settingA: false
+    settingB: "prod"
