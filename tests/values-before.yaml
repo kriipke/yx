@@ -5,7 +5,7 @@ global:
   containerSecurityContext: {}
   customAttributes: {}
   customSecretLicenseKey: ""
-  customSecretName: ""
+  customSecretName: "supersecret"
   dnsConfig: {some: "key"}
   fargate:
   fedramp:
