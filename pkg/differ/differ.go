@@ -10,6 +10,9 @@ import (
 	"github.com/kriipke/yiff/internal/core"
 )
 
+// Re-export for convenience, so cli can use differ.VariableDiff
+type VariableDiff = core.VariableDiff
+
 func flattenYAML(prefix string, v interface{}, out map[string]interface{}) {
 	switch node := v.(type) {
 	case map[string]interface{}:
