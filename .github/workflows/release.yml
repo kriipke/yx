@@ -1,48 +1,46 @@
-name: Build and Release Yiff
+name: Release
 
 on:
   push:
     tags:
-      - "v*.*.*" # Trigger only on versioned tags
-  workflow_dispatch:
- 
+      - 'v*'
+
 jobs:
-  build-and-release:
-    name: Build and Release Yiff
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # Set up Go environment
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.24
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
 
-      # Run Makefile to populate ./binaries
-      - name: Run Makefile
-        run: make
+    - name: Install dependencies
+      run: go mod tidy
 
-      # Build the yiff binary
-      - name: Build Yiff Binary
-        run: |
-          mkdir -p build
-          go build -o build/yiff
+    - name: Install git-cliff
+      run: |
+        curl -sSL https://github.com/orhun/git-cliff/releases/download/v2.1.0/git-cliff-linux-x86_64.tar.gz | tar xz
+        sudo mv git-cliff /usr/local/bin/
 
-      # Archive the binary for release
-      - name: Create Release Archive
-        run: |
-          mkdir -p release
-          tar -czvf release/yiff.tar.gz -C build yiff
+    - name: Generate changelog
+      run: git-cliff -o CHANGELOG.md
 
-      # Upload the release asset
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: release/yiff.tar.gz
-          asset_name: yiff.tar.gz
-          asset_content_type: application/gzip
+    - name: Build binaries
+      run: |
+        mkdir dist
+        GOOS=linux GOARCH=amd64 go build -o dist/yiff-linux-amd64 ./cmd/cli
+        GOOS=darwin GOARCH=amd64 go build -o dist/yiff-darwin-amd64 ./cmd/cli
+        GOOS=windows GOARCH=amd64 go build -o dist/yiff-windows-amd64.exe ./cmd/cli
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          dist/*
+          CHANGELOG.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
