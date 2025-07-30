@@ -1,3 +1,0 @@
-= `yiff`: YAML Differ
-
-  yiff ./values-dev.yaml ./values-qa.yaml
