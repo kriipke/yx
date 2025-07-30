@@ -1,4 +1,4 @@
-= **`+yiff+`** -- __YAML diff__
+= **`+yx+`** -- __YAML diff__
 
 === Usage
 ==== Compare Two Side-by-Side Files
