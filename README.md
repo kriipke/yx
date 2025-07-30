@@ -6,7 +6,7 @@ From the root of the repository:
 
 ### Start the Server
 ```shell
-$ go run cmd/web/main.go
+$ go run cmd/api/main.go
 2025/07/30 05:25:48 Starting web server on :8080
 ```
 
@@ -27,4 +27,16 @@ $ curl -sSd @tests/testdata.json http://localhost:8080/diff | jq
     }
   ]
 }
+```
+
+## Run as a Container
+
+From the root of the repository:
+
+```shell
+$ docker build -t yiff-api .
+```
+
+```shell
+$ docker run --rm -p "8080:8080" yiff-api
 ```
