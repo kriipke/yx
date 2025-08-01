@@ -1,6 +1,22 @@
 = **`+yx+`** -- __YAML diff__
 
 === Usage
+
+```
+Usage: $(basename "$0") [OPTIONS]
+
+Install a statically-linked nnn binary and its plugin installer.
+
+Options:
+  --flavor    [nerd|emoji|icons]   Flavor of nnn to install (default: nerd)
+  --version   VERSION              nnn version to install (default: 5.1)
+  --prefix    PREFIX               Installation prefix (default: /usr/local)
+  --help                           Show this help message and exit
+
+Examples:
+  ./install-nnn.sh --flavor emoji --version 5.1 --prefix /usr/local
+```
+
 ==== Compare Two Side-by-Side Files
 
 `$  yx ./tests/values-dev.yaml ./tests/values-prod.yaml`
