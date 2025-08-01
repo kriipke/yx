@@ -1,4 +1,4 @@
-name: Release
+name: Release 
 
 on:
   push:
@@ -25,15 +25,15 @@ jobs:
       - name: Build binaries
         run: |
           mkdir dist
-          GOOS=linux GOARCH=amd64 go build -o dist/yiff-linux-amd64 ./cmd/cli
-          GOOS=darwin GOARCH=amd64 go build -o dist/yiff-darwin-amd64 ./cmd/cli
-          GOOS=windows GOARCH=amd64 go build -o dist/yiff-windows-amd64.exe ./cmd/cli
+          GOOS=linux GOARCH=amd64 go build -o dist/yx-linux-amd64 ./cmd/cli
+          GOOS=darwin GOARCH=amd64 go build -o dist/yx-darwin-amd64 ./cmd/cli
+          GOOS=windows GOARCH=amd64 go build -o dist/yx-windows-amd64.exe ./cmd/cli
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.2
         with:
-          name: yiff-binaries-${{ github.ref_name }}
-          path: dist/yiff-*
+          name: yx-binaries-${{ github.ref_name }}
+          path: dist/yx-*
           if-no-files-found: error
 
   changelog:
@@ -70,7 +70,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: yiff-binaries-${{ github.ref_name }}
+          name: yx-binaries-${{ github.ref_name }}
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -78,7 +78,8 @@ jobs:
       - name: Upload the binary releases
         uses: svenstaro/upload-release-action@v2
         with:
-          file: binary_release.zip
+          file: */*.rpm
+          file_glob: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
           body: ${{ needs.changelog.outputs.release_body }}
